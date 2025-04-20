@@ -1,0 +1,11 @@
+# Add files here to ignore them from prettier formatting
+/dist
+/dist-lambda
+/coverage
+/.nx/cache
+/.nx/workspace-data
+build
+.idea
+node_modules
+.vscode
+.cursor

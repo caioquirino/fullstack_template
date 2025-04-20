@@ -1,0 +1,13 @@
+packages:
+  - packages/*
+  - apps/*
+  - libs/*
+
+onlyBuiltDependencies:
+  - '@apollo/protobufjs'
+  - '@nestjs/core'
+  - '@parcel/watcher'
+  - '@swc/core'
+  - esbuild
+  - nx
+  - sharp

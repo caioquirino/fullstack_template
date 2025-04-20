@@ -1,0 +1,4 @@
+cd "$(git rev-parse --show-toplevel)"
+pnpm lint:staged
+pnpm type-check
+pnpm install --frozen-lockfile

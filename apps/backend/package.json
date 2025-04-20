@@ -1,0 +1,78 @@
+{
+  "name": "@fullstack-template/backend",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "@fullstack-template/shared": "workspace:*"
+  },
+  "nx": {
+    "targets": {
+      "schema": {
+        "dependsOn": [
+          "build"
+        ],
+        "executor": "nx:run-commands",
+        "options": {
+          "cwd": "apps/backend",
+          "command": "node dist/generate-schema.js"
+        },
+        "outputs": [
+          "{options.outputPath}/../schema.graphql"
+        ]
+      },
+      "bundle": {
+        "dependsOn": [
+          "build"
+        ],
+        "executor": "nx:run-commands",
+        "options": {
+          "cwd": "apps/backend",
+          "command": "node bundle.js"
+        },
+        "outputs": [
+          "{options.outputPath}/../dist-bundle/*.js"
+        ]
+      },
+      "build": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "webpack-cli build",
+          "args": [
+            "node-env=production"
+          ]
+        },
+        "configurations": {
+          "development": {
+            "args": [
+              "node-env=development"
+            ]
+          }
+        }
+      },
+      "serve": {
+        "executor": "@nx/js:node",
+        "defaultConfiguration": "development",
+        "dependsOn": [
+          "build"
+        ],
+        "options": {
+          "buildTarget": "@fullstack-template/backend:build",
+          "runBuildTargetDependencies": false
+        },
+        "configurations": {
+          "development": {
+            "buildTarget": "@fullstack-template/backend:build:development"
+          },
+          "production": {
+            "buildTarget": "@fullstack-template/backend:build:production"
+          }
+        }
+      },
+      "test": {
+        "options": {
+          "passWithNoTests": true
+        }
+      }
+    }
+  }
+}

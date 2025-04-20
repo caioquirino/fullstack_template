@@ -1,0 +1,143 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+env:
+  AWS_ROLE_TO_ASSUME: 'arn:aws:iam::755072402630:role/fullstack-template-github-actions'
+  AWS_ACCOUNT_ID: '755072402630'
+  ROLE_SESSION_NAME: github-actions-session
+  AWS_REGION: eu-central-1
+  PNPM_VERSION: '10'
+  NODE_VERSION: '22'
+  TERRAFORM_VERSION: '1.11.3'
+  ECR_REPOSITORY: 'fullstack-template-dev'
+  STYTCH_PROJECT_ENV: 'test' # or 'live' for production
+  NEXT_PUBLIC_GRAPHQL_URL: 'https://dev.derank.eu/graphql'
+  STYTCH_PROJECT_ID: ${{ secrets.STYTCH_PROJECT_ID }}
+  STYTCH_SECRET_KEY: ${{ secrets.STYTCH_SECRET_KEY }}
+  PROJECT_NAME: 'fullstack-template'
+  ENVIRONMENT: 'dev'
+
+permissions:
+  id-token: write # For AWS access
+  actions: read
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      # This enables task distribution via Nx Cloud
+      # Run this command as early as possible, before dependencies are installed
+      # Learn more at https://nx.dev/ci/reference/nx-cloud-cli#npx-nxcloud-startcirun
+      # Uncomment this line to enable task distribution
+      # - run: pnpm dlx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="build"
+
+      # Cache node_modules
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+      - uses: nrwl/nx-set-shas@v4
+
+      - run: pnpm exec nx affected -t lint test
+
+  full-stack-infra:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ env.ROLE_SESSION_NAME }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Apply Full-Stack Basic Infra Terraform
+        run: |
+          cd terraform/full-stack-infra
+          ./apply.sh
+
+  application:
+    needs: [checks, full-stack-infra]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ env.ROLE_SESSION_NAME }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - run: pnpm install --frozen-lockfile
+      - uses: nrwl/nx-set-shas@v4
+
+      - run: pnpm exec nx run-many -t build,bundle --skip-nx-cache
+        env:
+          NEXT_PUBLIC_STYTCH_PROJECT_ID: ${{ secrets.STYTCH_PROJECT_ID }}
+          NEXT_PUBLIC_STYTCH_PROJECT_ENV: ${{ env.STYTCH_PROJECT_ENV }}
+          NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN: ${{ secrets.STYTCH_PUBLIC_TOKEN }}
+          NEXT_PUBLIC_GRAPHQL_URL: ${{ env.NEXT_PUBLIC_GRAPHQL_URL }}
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Apply Application Infra Terraform
+        env:
+          TF_VAR_github_sha: ${{ github.sha }}
+          TF_VAR_stytch_project_id: ${{ secrets.STYTCH_PROJECT_ID }}
+          TF_VAR_stytch_secret_key: ${{ secrets.STYTCH_SECRET_KEY }}
+          TF_VAR_stytch_project_env: ${{ env.STYTCH_PROJECT_ENV }}
+        run: |
+          cd terraform/application
+          ./apply.sh
+
+      - name: Export Secrets to AWS SSM
+        run: |
+          export_secret() {
+            local name=$1
+            local value=$2
+            local type=${3:-SecureString}
+            aws ssm put-parameter \
+              --name "/${{env.PROJECT_NAME}}/${{env.ENVIRONMENT}}/$name" \
+              --value "$value" \
+              --type "$type" \
+              --overwrite
+          }
+
+          export_secret "stytch-project-id" "${{ secrets.STYTCH_PROJECT_ID }}"
+          export_secret "stytch-secret-key" "${{ secrets.STYTCH_SECRET_KEY }}"
+          export_secret "stytch-public-token" "${{ secrets.STYTCH_PUBLIC_TOKEN }}"
+          export_secret "graphql-url" "${{ env.NEXT_PUBLIC_GRAPHQL_URL }}" "String"

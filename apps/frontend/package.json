@@ -1,0 +1,32 @@
+{
+  "name": "@fullstack-template/frontend",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "next": "~15.2.4",
+    "react": "19.0.0",
+    "react-dom": "19.0.0"
+  },
+  "nx": {
+    "targets": {
+      "codegen": {
+        "dependsOn": [
+          {
+            "target": "schema",
+            "projects": "backend"
+          }
+        ],
+        "executor": "nx:run-commands",
+        "options": {
+          "cwd": "apps/frontend",
+          "command": "graphql-codegen"
+        }
+      },
+      "build": {
+        "dependsOn": [
+          "codegen"
+        ]
+      }
+    }
+  }
+}
