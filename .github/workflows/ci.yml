@@ -6,7 +6,7 @@ on:
       - main
   pull_request:
 env:
-  AWS_ROLE_TO_ASSUME: 'arn:aws:iam::894312879693:role/fullstack-template-github-actions'
+  AWS_ROLE_TO_ASSUME: 'arn:aws:iam::894312879693:role/caioquirino-fullstack_template-github-actions'
   AWS_ACCOUNT_ID: '894312879693'
   ROLE_SESSION_NAME: github-actions-session
   AWS_REGION: eu-west-1
