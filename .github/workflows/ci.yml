@@ -9,13 +9,13 @@ env:
   AWS_ROLE_TO_ASSUME: 'arn:aws:iam::755072402630:role/fullstack-template-github-actions'
   AWS_ACCOUNT_ID: '755072402630'
   ROLE_SESSION_NAME: github-actions-session
-  AWS_REGION: eu-central-1
+  AWS_REGION: eu-west-1
   PNPM_VERSION: '10'
   NODE_VERSION: '22'
   TERRAFORM_VERSION: '1.11.3'
   ECR_REPOSITORY: 'fullstack-template-dev'
   STYTCH_PROJECT_ENV: 'test' # or 'live' for production
-  NEXT_PUBLIC_GRAPHQL_URL: 'https://dev.derank.eu/graphql'
+  NEXT_PUBLIC_GRAPHQL_URL: 'https://template.sandbox.caioquirino.com/graphql'
   STYTCH_PROJECT_ID: ${{ secrets.STYTCH_PROJECT_ID }}
   STYTCH_SECRET_KEY: ${{ secrets.STYTCH_SECRET_KEY }}
   PROJECT_NAME: 'fullstack-template'

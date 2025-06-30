@@ -10,5 +10,5 @@ variable "project_environment" {
 
 variable "domain_name" {
   type    = string
-  default = "dev.derank.eu"
+  default = "template.sandbox.caioquirino.com"
 }

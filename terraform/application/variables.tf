@@ -16,7 +16,7 @@ variable "github_sha" {
 variable "aws_region" {
   description = "The AWS region to use"
   type        = string
-  default     = "eu-central-1"
+  default     = "eu-west-1"
 }
 
 variable "stytch_project_id" {
@@ -35,8 +35,4 @@ variable "stytch_project_env" {
   description = "The Stytch project environment (test or live)"
   type        = string
   default     = "test"
-  validation {
-    condition     = contains(["test", "live"], var.stytch_project_env)
-    error_message = "stytch_project_env must be either 'test' or 'live'"
-  }
 }

@@ -2,9 +2,9 @@
 set -e
 
 # Configuration
-REGION="eu-central-1"
+REGION="eu-west-1"
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text --no-cli-pager)
-BUCKET_NAME="${AWS_ACCOUNT_ID}-terraform-state"
+BUCKET_NAME="${AWS_ACCOUNT_ID}-template-terraform-state"
 
 # Source .env file from git root if it exists and not in GitHub Actions
 if [[ -z "${GITHUB_ACTIONS}" ]]; then

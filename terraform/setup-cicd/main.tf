@@ -8,7 +8,7 @@ terraform {
   }
   backend "s3" {
     key    = "setup_cicd/terraform.tfstate"
-    region = "eu-central-1"
+    region = "eu-west-1"
   }
 }
 
@@ -24,7 +24,7 @@ variable "repository" {
 data "aws_caller_identity" "current" {}
 
 provider "aws" {
-  region = "eu-central-1"
+  region = "eu-west-1"
 }
 
 module "github_actions_oidc" {

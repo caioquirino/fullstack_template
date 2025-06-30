@@ -32,7 +32,7 @@ const Login = ({ queryParams }: { queryParams: AuthState }) => {
   const config = {
     products: [Products.oauth],
     oauthOptions: {
-      providers: [{ type: OAuthProviders.Discord }],
+      providers: [{ type: OAuthProviders.Google }],
       loginRedirectURL: buildRedirectUrl(`${getDomainFromWindow()}/authenticate`),
       pkceEnabled: true,
     },

@@ -12,24 +12,24 @@ terraform {
   }
   backend "s3" {
     key    = "application/terraform.tfstate"
-    region = "eu-central-1"
+    region = "eu-west-1"
   }
 }
 
 provider "aws" {
-  region = "eu-central-1"
+  region = "eu-west-1"
   default_tags {
     tags = local.default_tags
   }
 }
 
 provider "aws" {
-  region = "eu-central-1"
+  region = "eu-west-1"
   alias  = "application"
 }
 
 provider "aws" {
-  region = "eu-central-1"
+  region = "eu-west-1"
   alias  = "eu_central_1"
   default_tags {
     tags = local.default_tags

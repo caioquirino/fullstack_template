@@ -3,9 +3,9 @@ data "aws_caller_identity" "current" {}
 data "terraform_remote_state" "full_stack_infra" {
   backend = "s3"
   config = {
-    bucket = "${data.aws_caller_identity.current.account_id}-terraform-state"
+    bucket = "${data.aws_caller_identity.current.account_id}-template-terraform-state"
     key    = "full-stack-infra/terraform.tfstate"
-    region = "eu-central-1"
+    region = "eu-west-1"
   }
 }
 

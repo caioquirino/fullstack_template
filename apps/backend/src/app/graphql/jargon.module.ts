@@ -15,7 +15,7 @@ import { AuthModule } from '../auth/auth.module'
         return new JargonService(
           new JargonRepository(
             new DynamoDBClient({
-              region: process.env.AWS_REGION || 'eu-central-1',
+              region: process.env.AWS_REGION || 'eu-west-1',
             }),
           ),
         )

@@ -19,9 +19,9 @@ fi
 REPOSITORY="${1}" 
 
 # Configuration
-REGION="eu-central-1"
+REGION="eu-west-1"
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text --no-cli-pager)
-BUCKET_NAME="${AWS_ACCOUNT_ID}-terraform-state"
+BUCKET_NAME="${AWS_ACCOUNT_ID}-template-terraform-state"
 
 # Create S3 bucket for Terraform state if it doesn't exist
 if ! aws s3api head-bucket --bucket "$BUCKET_NAME" 2>/dev/null --no-cli-pager; then

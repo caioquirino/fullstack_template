@@ -8,16 +8,16 @@ terraform {
   }
   backend "s3" {
     key    = "full-stack-infra/terraform.tfstate"
-    region = "eu-central-1"
+    region = "eu-west-1"
   }
 }
 
 provider "aws" {
-  region = "eu-central-1"
+  region = "eu-west-1"
 }
 
 provider "aws" {
-  region = "eu-central-1"
+  region = "eu-west-1"
   alias  = "eu_central_1"
 }
 
